@@ -6,6 +6,7 @@ import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -35,7 +36,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private boolean isGPSEnabled = false;
     private boolean isNetworkEnabled = false;
     private boolean canGetLocation = false;
+    private boolean gotMyLocationOneTime;
+    private double latitude, longitude;
     private EditText locationSearch;
+
+    private static final long MIN_TIME_BW_UPDATES = 1000 * 5;
+    private static final float MIN_DISTANCE_cHANGE_FOR_UPDATES = 0.0f;
+    private static final int MY_LOC_BOOM_FACTOR = 17;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +98,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.setMyLocationEnabled(true);
         }
         locationSearch = (EditText) findViewById(R.id.editText_address);
+
+        gotMyLocationOneTime = false;
+        getLocation();
 
     }
 
@@ -168,6 +178,128 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             }
         }
+
+    }
+
+    public void getLocation(){
+        try{
+            locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+
+            //Get GPS status, isProviderEnabled returns true if user has enabled gps
+            isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+            if(isGPSEnabled){
+                Log.d("MapsApp", "getLocation: GPS is enabled");
+            }
+            isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+            if(isNetworkEnabled){
+                Log.d("MapsApp", "getLocation: Network is enabled");
+            }
+
+            if(!isGPSEnabled&&!isNetworkEnabled){
+                Log.d("MapsApp", "getLocation: No provider enabled");
+            }
+            else{
+              if(isNetworkEnabled){
+                  //Request location updates
+                  if((ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!=PackageManager.PERMISSION_GRANTED)
+                  && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)!=PackageManager.PERMISSION_GRANTED){
+                      return;
+                  }
+                  locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_cHANGE_FOR_UPDATES, locationListenerNetwork);
+              }if(isGPSEnabled){
+                    //Request location updates
+                    if((ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!=PackageManager.PERMISSION_GRANTED)
+                            && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)!=PackageManager.PERMISSION_GRANTED){
+                        return;
+                    }
+                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_cHANGE_FOR_UPDATES, locationListenerGPS);
+                }
+            }
+        }catch(Exception e){
+            Log.d("MapsApp", "getLocation: Exception in getLocation");
+            e.printStackTrace();
+        }
+
+    }
+
+    //LocationListener to setup callbacks for requestLocationUpdates
+    LocationListener locationListenerNetwork = new LocationListener() {
+        @Override
+        public void onLocationChanged(Location location) {
+            dropAMarker(LocationManager.NETWORK_PROVIDER);
+            //Check if doing one time, if so, remove updates to both gps and network
+            if(gotMyLocationOneTime==false){
+                locationManager.removeUpdates(this);
+                locationManager.removeUpdates(locationListenerGPS);
+                gotMyLocationOneTime = true;
+            }
+            else{
+                if(isNetworkEnabled){
+                    //Request location updates
+                    if((ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)!=PackageManager.PERMISSION_GRANTED)
+                            && ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION)!=PackageManager.PERMISSION_GRANTED){
+                        return;
+                    }
+                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_cHANGE_FOR_UPDATES, locationListenerNetwork);
+                }
+            }
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+            Log.d("MapsApp", "locationListenerNetwork: Status change");
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+
+        }
+    };
+
+    LocationListener locationListenerGPS = new LocationListener() {
+        @Override
+        public void onLocationChanged(Location location) {
+            dropAMarker(LocationManager.GPS_PROVIDER);
+            //Check if doing one time, if so, remove updates to both gps and network
+            if(gotMyLocationOneTime==false){
+                locationManager.removeUpdates(this);
+                locationManager.removeUpdates(locationListenerNetwork);
+                gotMyLocationOneTime = true;
+            }
+            else{
+                if(isGPSEnabled){
+                    //Request location updates
+                    if((ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)!=PackageManager.PERMISSION_GRANTED)
+                            && ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION)!=PackageManager.PERMISSION_GRANTED){
+                        return;
+                    }
+                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_cHANGE_FOR_UPDATES, locationListenerGPS);
+                }
+            }
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+            Log.d("MapsApp", "locationListenerNetwork: Status change");
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+
+        }
+    };
+
+    public void dropAMarker(String provider){
 
     }
 }
