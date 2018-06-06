@@ -224,7 +224,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Log.d("MapsApp", "getLocation: Exception in getLocation");
             e.printStackTrace();
         }
-
     }
 
     //LocationListener to setup callbacks for requestLocationUpdates
@@ -296,12 +295,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 break;
             case LocationProvider.OUT_OF_SERVICE:
                     //enable network updates
+                    isNetworkEnabled=true;
             break;
             case LocationProvider.TEMPORARILY_UNAVAILABLE:
                 //enable both network and GPS
-                    break;
+                isNetworkEnabled=true;
+                isGPSEnabled=true;
+                break;
             default:
                 //enable both network and gps
+                isNetworkEnabled=true;
+                isGPSEnabled=true;
             }
 
         }
@@ -322,20 +326,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //            if(checkSelfPermission fails){
 //                return;
 //            }
-            if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-                Log.d("MapsApp", "Failed  FINE permission check.");
-                ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION},2);
+            if((ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+            ||(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)){
+                Log.d("MapsApp", "dropAMarker: Failed checkSelfPermission.");
+                return;
             }
 
-            if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-                 Log.d("MapsApp", "Failed COARSE permission check.");
-                ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_COARSE_LOCATION},2);
-            }
-
-            if((ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)||
-                (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)){
-                 mMap.setMyLocationEnabled(true);
-            }
             myLocation = locationManager.getLastKnownLocation(provider);
             LatLng userLocation = null;
             if(myLocation==null){
