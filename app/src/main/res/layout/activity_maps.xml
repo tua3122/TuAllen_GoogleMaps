@@ -10,17 +10,44 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/background_light"
-        android:weightSum="1">
+        android:orientation="horizontal">
 
         <Button
-            android:id="@+id/button_view"
+            android:id="@+id/button_view4"
             style="@style/Widget.AppCompat.Button.Colored"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="right"
+            android:layout_weight="1"
             android:onClick="changeView"
             android:text="View"></Button>
+
+        <Button
+            android:id="@+id/button_track"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:layout_weight="1"
+            android:onClick="trackMyLocation"
+            android:text="Track"></Button>
+
+        <Button
+            android:id="@+id/button_clear"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:layout_weight="1"
+            android:onClick="clearMarkers"
+            android:text="Clear"></Button>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/background_light"
+        android:weightSum="1">
 
         <EditText
             android:id="@+id/editText_address"
@@ -41,7 +68,7 @@
     </LinearLayout>
 
 
-<fragment xmlns:android="http://schemas.android.com/apk/res/android"
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:map="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/map"
