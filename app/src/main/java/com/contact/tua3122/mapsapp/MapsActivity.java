@@ -42,12 +42,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private boolean canGetLocation = false;
     private boolean gotMyLocationOneTime;
     private double latitude, longitude;
-    private boolean notTrackingMyLocation = true;
+    private boolean notTrackingMyLocation = true; //was true
     private EditText locationSearch;
 
-    private static final long MIN_TIME_BW_UPDATES = 1000 * 5;
-    private static final float MIN_DISTANCE_cHANGE_FOR_UPDATES = 0.0f;
-    private static final int MY_LOC_ZOOM_FACTOR = 17;
+    private static final long MIN_TIME_BW_UPDATES = 1000 * 1;
+    private static final float MIN_DISTANCE_CHANGE_FOR_UPDATES = 0.0f;
+    private static final int MY_LOC_ZOOM_FACTOR = 18;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,32 +80,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));*/
 
         //Add a marker at your place of birth and move the camera to it.
-        //When the marer is tapped, display "Born here"
-//        LatLng maryland = new LatLng(39, -77);
-//        mMap.addMarker(new MarkerOptions().position(maryland).title("Born Here"));
-//        mMap.moveCamera(CameraUpdateFactory.newLatLng(maryland));
+        //When the marker is tapped, display "Born here"
+        LatLng maryland = new LatLng(39, -77);
+        mMap.addMarker(new MarkerOptions().position(maryland).title("Born Here"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(maryland));
 
 
-//        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-//            Log.d("MapsApp", "Failed  FINE permission check.");
-//            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION},2);
-//
-//        }
-//
-//        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-//            Log.d("MapsApp", "Failed COARSE permission check.");
-//            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_COARSE_LOCATION},2);
-//
-//        }
-//
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+            Log.d("MapsApp", "Failed  FINE permission check.");
+            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION},2);
+
+        }
+
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+            Log.d("MapsApp", "Failed COARSE permission check.");
+            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_COARSE_LOCATION},2);
+
+        }
+
 //        if((ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)||
 //            (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)){
 //            mMap.setMyLocationEnabled(true);
 //        }
         locationSearch = (EditText) findViewById(R.id.editText_address);
 
-        gotMyLocationOneTime = false;
-        getLocation();
+        //gotMyLocationOneTime = false;
+        //getLocation();
 
     }
 
@@ -177,7 +177,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 for(int i = 0; i < addressList.size(); i++){
                     Address address = addressList.get(i);
                     LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                    mMap.addMarker(new MarkerOptions().position(latLng).title(i+": " + address.getSubThoroughfare() + address.getSubThoroughfare()));
+                    mMap.addMarker(new MarkerOptions().position(latLng).title(i+": " + address.getSubThoroughfare()));
                     mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
 
                 }
@@ -204,20 +204,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Log.d("MapsApp", "getLocation: No provider enabled");
             }
             else{
-              if(isNetworkEnabled){
-                  //Request location updates
-                  if((ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!=PackageManager.PERMISSION_GRANTED)
-                  && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)!=PackageManager.PERMISSION_GRANTED){
-                      return;
-                  }
-                  locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_cHANGE_FOR_UPDATES, locationListenerNetwork);
-              }if(isGPSEnabled){
+                if(isNetworkEnabled){
                     //Request location updates
                     if((ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!=PackageManager.PERMISSION_GRANTED)
                             && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)!=PackageManager.PERMISSION_GRANTED){
                         return;
                     }
-                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_cHANGE_FOR_UPDATES, locationListenerGPS);
+                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListenerNetwork);
+                }if(isGPSEnabled){
+                    //Request location updates
+                    if((ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!=PackageManager.PERMISSION_GRANTED)
+                            && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)!=PackageManager.PERMISSION_GRANTED){
+                        return;
+                    }
+                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListenerGPS);
                 }
             }
         }catch(Exception e){
@@ -244,7 +244,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             && ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION)!=PackageManager.PERMISSION_GRANTED){
                         return;
                     }
-                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_cHANGE_FOR_UPDATES, locationListenerNetwork);
+                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListenerNetwork);
                 }
             }
         }
@@ -282,7 +282,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //                            && ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION)!=PackageManager.PERMISSION_GRANTED){
 //                        return;
 //                    }
-//                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_cHANGE_FOR_UPDATES, locationListenerGPS);
+//                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListenerGPS);
 //                }
             }
         }
@@ -294,9 +294,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             case LocationProvider.AVAILABLE:
                 break;
             case LocationProvider.OUT_OF_SERVICE:
-                    //enable network updates
-                    isNetworkEnabled=true;
-            break;
+                //enable network updates
+                isNetworkEnabled=true;
+                break;
             case LocationProvider.TEMPORARILY_UNAVAILABLE:
                 //enable both network and GPS
                 isNetworkEnabled=true;
@@ -306,6 +306,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 //enable both network and gps
                 isNetworkEnabled=true;
                 isGPSEnabled=true;
+                //break;
             }
 
         }
@@ -327,7 +328,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //                return;
 //            }
             if((ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-            ||(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)){
+            &&(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)){
                 Log.d("MapsApp", "dropAMarker: Failed checkSelfPermission.");
                 return;
             }
@@ -380,8 +381,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void trackMyLocation(View view){
         //tick off the location tracker using getLocation to start the LocationListener
         if(notTrackingMyLocation){
+            if(gotMyLocationOneTime==false){
+                gotMyLocationOneTime=true;
+            }
             getLocation();
             notTrackingMyLocation = false;
+
+
         }
         else{
             locationManager.removeUpdates(locationListenerGPS);
@@ -393,4 +399,5 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void clearMarkers(View view){
         mMap.clear();
     }
+
 }
