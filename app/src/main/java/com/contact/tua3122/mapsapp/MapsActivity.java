@@ -99,7 +99,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         if((ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)||
             (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)){
-            mMap.setMyLocationEnabled(true);
+            //mMap.setMyLocationEnabled(true);
         }
         locationSearch = (EditText) findViewById(R.id.editText_address);
 
@@ -180,7 +180,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 for(int i = 0; i < addressList.size(); i++){
                     Address address = addressList.get(i);
                     LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                    mMap.addMarker(new MarkerOptions().position(latLng).title(location+": " + address.getSubThoroughfare()));
+                    mMap.addMarker(new MarkerOptions().position(latLng).title(location+": " + address.getAddressLine(0)));
                     mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
                 }
             }
